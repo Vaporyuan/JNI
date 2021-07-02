@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CCCCCC"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/color_padding">
+
+        <TextView
+            android:id="@+id/tv_show_attrs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#0000ff"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/button_Exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="40dp"
+            android:text="EXIT"
+            android:textColor="#ff0000"
+            android:textSize="20sp" />
+
+        <SurfaceView
+            android:id="@+id/color_view"
+            android:layout_width="320px"
+            android:layout_height="240px"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="40dp" />
+
+        <com.hjimi.color.GLPanel
+            android:id="@+id/sv_color_view"
+            android:layout_width="320px"
+            android:layout_height="240px"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="40dp"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/color_padding">
+
+        <TextView
+            android:id="@+id/tv_depthvalue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#0000ff"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/depth_tv_show_attrs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_depthvalue"
+            android:textColor="#0000ff"
+            android:textSize="14sp" />
+
+        <com.hjimi.color.GLPanel
+            android:id="@+id/sv_depth_view"
+            android:layout_width="320px"
+            android:layout_height="240px"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="40dp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/color_padding">
+
+        <TextView
+            android:id="@+id/tv_ir_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#0000ff"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/ir_tv_show_attrs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_ir_value"
+            android:textColor="#0000ff"
+            android:textSize="14sp" />
+        <Button
+            android:id="@+id/button_ir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="40dp"
+            android:text="GO IR"
+            android:textColor="#ff0000"
+            android:textSize="20sp" />
+        <com.hjimi.color.GLPanel
+            android:id="@+id/sv_ir_view"
+            android:layout_width="320px"
+            android:layout_height="240px"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="40dp" />
+
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_marginTop="10dip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_pass"
+            android:text="@string/pass"
+            android:textSize="17sp" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_fail"
+            android:textSize="17sp"
+            android:layout_marginLeft="50dip"
+            android:text="@string/fail" />
+    </LinearLayout>
+</LinearLayout>

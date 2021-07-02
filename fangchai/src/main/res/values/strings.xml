@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Fangchai</string>
+    <string name="malio_se_lock_mind">设备异常，已被锁定。\n 防拆状态码：%1$s</string>
+</resources>

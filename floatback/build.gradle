@@ -1,0 +1,63 @@
+plugins {
+    id 'com.android.application'
+}
+
+ext.majorNumber = 0
+ext.minorNumber = 0
+ext.revisionNumber = 1
+
+static def getVersionCode(boolean isRelease) {
+    Integer.parseInt(new Date().format("yyMMddHHmm"))
+}
+//Major_Version_Number.Minor_Version_Number[Revision_Number[.Build_Number]]
+def getVersionName(boolean isRelease) {
+    String today = new Date().format("yyMMdd")
+    String time = new Date().format("HHmmss")
+    majorNumber + "." + minorNumber + "." + revisionNumber + "_$today.$time"
+//+ "." + revisionDescription +"_$today.$time"
+}
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.ob.floatback"
+        minSdkVersion 23
+        targetSdkVersion 30
+        versionCode getVersionCode(false)
+        versionName getVersionName(false)
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            output.versionCodeOverride = getVersionCode(false)
+            output.versionNameOverride = getVersionName(false)
+            variant.getPackageApplication().outputDirectory = new File(output.outputFile.parent)
+            outputFileName = "MalioFloatBack_${variant.mergedFlavor.versionName}.apk"
+        }
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    compileOnly files('libs/framework.jar')
+}

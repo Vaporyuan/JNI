@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">重启测试</string>
+    <string name="temperature_warn_title">温度警告</string>
+    <string name="temperature_warn_message">温度超过正常范围</string>
+</resources>

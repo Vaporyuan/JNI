@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">UrovoCamera</string>
+    <string name="iminect">彩色图</string>
+    <string name="pass">成功</string>
+    <string name="fail">失败</string>
+</resources>
