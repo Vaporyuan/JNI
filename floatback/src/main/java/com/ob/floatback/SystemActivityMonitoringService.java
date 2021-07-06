@@ -174,7 +174,10 @@ public class SystemActivityMonitoringService extends Service {
                     if (DEBUG) Log.i(TAG, "New top task: " + newTopTaskInfo);
                     //OB ADD begin 当前活动界面是不是桌面
                     String newTaskPackageName = newTopTaskInfo.topActivity.getPackageName();
-                    if (getHomes().contains(newTaskPackageName) && !newTaskPackageName.equals("com.android.settings")) {
+                    boolean isStopFxService = (getHomes().contains(newTaskPackageName) || FloatPackagePolicy.isBlackPackages(newTaskPackageName))
+                            && !FloatPackagePolicy.isWhitePackages(newTaskPackageName);
+                    if (DEBUG) Log.i(TAG, "isStopFxService = " + isStopFxService);
+                    if (isStopFxService) {
                         Log.i(TAG, "New top task: is Launcher " + newTaskPackageName);
                         stopFxService();
                     } else {
@@ -217,8 +220,9 @@ public class SystemActivityMonitoringService extends Service {
                 && (taskList.get(0) != null)
                 && (taskList.get(0).topActivity != null)
                 && (taskList.get(0).topActivity.getPackageName() != null)
-                && getHomes().contains(taskList.get(0).topActivity.getPackageName())
-                && !taskList.get(0).topActivity.getPackageName().equals("com.android.settings")) {
+                && (getHomes().contains(taskList.get(0).topActivity.getPackageName()) ||
+                FloatPackagePolicy.isBlackPackages(taskList.get(0).topActivity.getPackageName()))
+                && !FloatPackagePolicy.isWhitePackages(taskList.get(0).topActivity.getPackageName())) {
             Log.e(TAG, "isHomeTopActivity: " + taskList.get(0).topActivity.getClassName());
             return true;
         }

@@ -1,0 +1,8 @@
+{
+    "whitePackages":[
+        "com.android.settings"
+    ],
+    "blackPackages":[
+        "com.ob.fangchai"
+    ]
+}
