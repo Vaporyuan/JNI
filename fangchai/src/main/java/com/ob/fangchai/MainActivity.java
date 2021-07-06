@@ -7,8 +7,10 @@ import android.app.StatusBarManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.device.MalioSeManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ServiceManager;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -19,8 +21,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
-
 import java.util.List;
 
 
@@ -30,6 +30,7 @@ public class MainActivity extends Activity {
     private MalioSeManager malioSeManager;
     private StatusBarManager statusBarManager;
     private IActivityManager mIActivityManager;
+    private TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +51,28 @@ public class MainActivity extends Activity {
         if (mIActivityManager == null) {
             mIActivityManager = IActivityManager.Stub.asInterface(ServiceManager.getService(Context.ACTIVITY_SERVICE));
         }
-        String tamperStr = "0x" + HexDump.toHexString(malioSeManager.getTamperStatusInt());
-        TextView mTextView = findViewById(R.id.tv_malio_lock);
-        mTextView.setText(String.format(getResStr(R.string.malio_se_lock_mind), tamperStr));
+
+        mTextView = findViewById(R.id.tv_malio_lock);
+        updateTextView();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //3S后再更新一次状态，以防误差
+                updateTextView();
+            }
+        }, 3000);
 
         //屏蔽状态栏，进入霸屏模式
         disableStatusBar();
         Log.d(TAG, "onCreate getPackageName(): " + getPackageName());
         setLockTaskMode(getPackageName(), true);
+    }
+
+    private void updateTextView() {
+        String tamperStr = "0x" + HexDump.toHexString(malioSeManager.getTamperStatusInt());
+        mTextView.setText(String.format(getResStr(R.string.malio_se_lock_mind), tamperStr));
+        mTextView.setTextColor(Color.RED);
+        Log.d(TAG, "onCreate updateTextView, tamperStr = " + tamperStr);
     }
 
     @Override
