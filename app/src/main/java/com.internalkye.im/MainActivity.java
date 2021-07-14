@@ -12,6 +12,12 @@ import android.content.pm.IPackageInstallObserver;
 import android.content.pm.PackageManager;
 import android.device.MalioDeviceManager;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -30,7 +36,9 @@ import com.example.MessengerService;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Locale;
+import java.util.ArrayList;
+
+import vendor.mediatek.hardware.nvram.V1_0.INvram;
 
 public class MainActivity extends Activity {
 
@@ -88,10 +96,12 @@ public class MainActivity extends Activity {
                 intent.setPackage("com.ob.floatback");
                 startService(intent);*/
 
-                Intent mService = new Intent("com.ob.action.BOOT_FLOAT_BACK");
+                /*Intent mService = new Intent("com.ob.action.BOOT_FLOAT_BACK");
                 mService.setPackage("com.ob.floatback");
-                startService(mService);
-
+                startService(mService);*/
+                //customNetwork(NetworkCapabilities.TRANSPORT_WIFI);
+                int value = "".contentEquals(mWhiteEv.getText()) ? 0 : Integer.parseInt(mWhiteEv.getText().toString());
+                writeNV(value);
 
             }
         });
@@ -140,6 +150,83 @@ public class MainActivity extends Activity {
         //注册广播
         //registerReceiver(netWorkChangeReceiver, intentFilter);
 
+    }
+
+
+    private void writeNV(int value) {
+        String filePathName = "/vendor/nvdata/APCFG/APRDEB/TPW_H_FLAG";
+        ArrayList<Byte> dataArray = new ArrayList<Byte>();
+        dataArray.add((byte) value);
+        try {
+            INvram agent = INvram.getService();
+            if (agent != null) {
+                byte a = agent.writeFileByNamevec(filePathName, dataArray.size(), dataArray);
+                Log.i(TAG, "malio write---->: " + a);
+                String buff = agent.readFileByName(filePathName, 1);
+                Log.i(TAG, "malio read---->: " + buff);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * NetworkCapabilities.TRANSPORT_CELLULAR    移动数据
+     * NetworkCapabilities.TRANSPORT_WIFI        WIFI
+     * NetworkCapabilities.TRANSPORT_BLUETOOTH   蓝牙
+     * NetworkCapabilities.TRANSPORT_ETHERNET    以太网
+     * NetworkCapabilities.TRANSPORT_VPN         VPN
+     */
+    private void customNetwork(int transportType) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            Log.d(TAG, "enter customNetwork!!");
+            final ConnectivityManager connectivityManager =
+                    (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkRequest.Builder builder = new NetworkRequest.Builder();
+            builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            builder.addTransportType(transportType);
+            NetworkRequest request = builder.build();
+            ConnectivityManager.NetworkCallback callback = new ConnectivityManager.NetworkCallback() {
+
+                /**
+                 * 网络可用的回调连接成功
+                 * */
+                @Override
+                public void onAvailable(Network network) {
+                    //Network 101 WIFI
+                    //Network 103 CELLULAR
+                    Log.d(TAG, "onAvailable: network = " + network);
+                    //设置默认网络
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        connectivityManager.bindProcessToNetwork(network);
+                    } else {
+                        ConnectivityManager.setProcessDefaultNetwork(network);
+                    }
+                    //连上不能上网wifi，开启数据流量测试是否可以ping成功
+                    //pingHost("14.215.177.38"); //测试网络 ping www.baidu.com
+                    mWhiteEv.setText("pingHost ==>" + pingHost("14.215.177.38"));
+                }
+            };
+            connectivityManager.requestNetwork(request, callback);
+        }
+    }
+
+    /**
+     * <uses-permission android:name="android.permission.INTERNET" />
+     * @param ip
+     * @return ping result
+     */
+    public static boolean pingHost(String ip) {  //ip为要ping的IP地址
+        boolean result = false;
+        try {
+            Process p = Runtime.getRuntime().exec("ping -c 1 -w 100 " + ip);
+            int status = p.waitFor();
+            result = status == 0;
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "pingHost ==>" + ip + " result==>" + result);
+        return result;
     }
 
     /**
