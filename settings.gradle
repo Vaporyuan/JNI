@@ -1,3 +1,4 @@
+include ':androidsocket'
 include ':floatback'
 include ':fangchai'
 include ':app', ':demo', ':jna', ':urovocamera', ':reboottest', ':kotlin'

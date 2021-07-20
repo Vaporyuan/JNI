@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">AndroidSocKet</string>
+    <string name="benchmark">标准机</string>
+    <string name="failture_title">出错提示</string>
+    <string name="success_title">完成提示</string>
+    <string name="ok">OK</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <string name="fail_delta_larger">校准出现较大偏差，未记录校准值，请确认是否重新校准？</string>
+    <string name="fail_write_nv">校准值写入NV失败，请确认是否重新校准？</string>
+    <string name="suc_calibration">校准成功！，校准值是：</string>
+    <string name="cur_press">当前气压值:</string>
+    <string name="cur_temp">当前温度值:</string>
+    <string name="benchmark_press">标准机均值:</string>
+    <string name="product_press">测试机均值:</string>
+    <string name="delta_press">偏差值:</string>
+</resources>
