@@ -1,82 +1,36 @@
 package com.example.demo;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 
-import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.device.DeviceManager;
-import android.device.ScanManager;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.hardware.Camera;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.net.Uri;
-import android.nfc.NfcAdapter;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.RemoteException;
-import android.preference.ListPreference;
-import android.system.Os;
 import android.system.StructUtsname;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 
-import com.example.demo.utils.ApkUtils;
-import com.example.demo.utils.PosConstant;
+import com.malio.server.pm.CITICApkFile;
+import com.malio.server.pm.demo.MalioApkFile;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1SequenceParser;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERExternal;
-import org.bouncycastle.asn1.DERExternalParser;
 import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.util.encoders.Base64;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -85,20 +39,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
+import java.io.InputStreamReader;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,7 +57,7 @@ public class MainActivity extends Activity {
     private NotificationManager manager;
     DeviceManager mDevice;
     EditText editText;
-    private static String signAppName = "/sdcard/ludashi_home_signedV3.apk"; //"/sdcard/iluncher_signedV3.apk";
+    private static String signAppName = "/sdcard/AppForPOC.apk"; //"/sdcard/iluncher_signedV3.apk";
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -171,9 +118,12 @@ public class MainActivity extends Activity {
                 /*VerityApkFile verityApkFile = new VerityApkFile(signAppName);
                 verityApkFile.verifyApkSign();*/
 
-                Intent intent = new Intent("malio.intent.se.trigger");
+                MalioApkFile malioApkFile = new MalioApkFile(signAppName);
+                malioApkFile.verifyUbxApkSign();
+
+                /*Intent intent = new Intent("malio.intent.se.trigger");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                MainActivity.this.startActivity(intent);
+                MainActivity.this.startActivity(intent);*/
             }
         });
 
@@ -181,13 +131,15 @@ public class MainActivity extends Activity {
         mButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
+                CITICApkFile citicApkFile = new CITICApkFile(signAppName);
+                citicApkFile.verifyCITICApkSign();
+                /*try {
                     CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
                     Certificate caCer = certificateFactory.generateCertificate(new ByteArrayInputStream(acquirer_root));
                     Log.i(TAG, "verifyAPKDoubleV2Sign caCer: " + caCer);
                 }catch (Exception e){
                     e.printStackTrace();
-                }
+                }*/
 
                 //SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");//设置日期格式
                 //Log.i("VerityApkFile", "0----------->: " + df.format(new Date()));
@@ -213,6 +165,54 @@ public class MainActivity extends Activity {
         //mHandler.sendMessageDelayed(Message.obtain(), 60000*5);
     }
 
+
+    /**
+     * 以太网获取路由id地址
+     *
+     * @return
+     */
+    private static String getEthernetRouteIpAddress() {
+
+
+        String ip = "";
+        String ipHave = "";
+        try {
+            Process p = Runtime.getRuntime().exec("ip route show");
+            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+
+            //获取到的可能包含ip的信息如下：
+            //default via 192.168.2.1 dev eth0
+            //default via 192.168.2.1 dev eth0  metric 206
+            //192.168.2.0/24 dev eth0  scope link
+            //192.168.2.0/24 dev eth0  proto kernel  scope link  src 192.168.2.21  metric 206
+            //192.168.2.0 dev eth0  scope link
+
+            while ((line = in.readLine()) != null
+                    && !line.equals("null")) {
+                if (line.contains("default via ")) {
+                    ipHave += line;
+                    break;
+                }
+            }
+
+
+            /*if (!"".equals(ipHave)) {
+                //获取网关ip信息
+                String patternS = "default via (\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) dev eth0 ";
+                Pattern p1 = Pattern.compile(patternS);
+                Matcher matcher = p1.matcher(ipHave);
+                if (matcher.matches())
+                    ip = matcher.group(1);
+                return ip;//拿到ip则返回了
+            }*/
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return ipHave;
+    }
 
     @Override
     protected void onDestroy() {

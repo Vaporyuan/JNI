@@ -7,7 +7,7 @@ ext.minorNumber = 0
 ext.revisionNumber = 1
 
 static def getVersionCode(boolean isRelease) {
-    Integer.parseInt(new Date().format("yyMMddHHmm"))
+    Integer.parseInt(new Date().format("MMddHHmm"))
 }
 //Major_Version_Number.Minor_Version_Number[Revision_Number[.Build_Number]]
 def getVersionName(boolean isRelease) {

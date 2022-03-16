@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class ReadApkSignData {
-    private ArrayList<BlockInfo> blockInfos;
+    private final ArrayList<BlockInfo> blockInfos;
 
     /**
      * the struct that describe each block of the apk file
@@ -34,11 +34,11 @@ public class ReadApkSignData {
      * function: to read 1024 block of the apk file to verify
      *
      **/
-    class BlockInfo {
-        private long offset;
-        private long blockLength;
-        private RandomAccessFile raf;
-        private ByteBuffer data;
+    static class BlockInfo {
+        private final long offset;
+        private final long blockLength;
+        private final RandomAccessFile raf;
+        private final ByteBuffer data;
 
         public BlockInfo(long offset,long blockLength,RandomAccessFile raf) {
             this.offset = offset;
@@ -85,25 +85,25 @@ public class ReadApkSignData {
         blockInfos = new ArrayList<>();
 
         // init Contents of ZIP entries block
-        BlockInfo blockInfo = new BlockInfo(0,cozeLength,apkFile);
+        BlockInfo blockInfo = new BlockInfo(0, cozeLength, apkFile);
         blockInfos.add(blockInfo);
 
         // init APK Signing Block without sgn data
         if (asbLength != 0) {
-            blockInfo = new BlockInfo(cozeLength,asbLength,asbData);
+            blockInfo = new BlockInfo(cozeLength, asbLength, asbData);
             blockInfos.add(blockInfo);
         }
 
         // init Central Directory block
-        blockInfo = new BlockInfo(cozeLength + asbLength,cdLength,cdData);
+        blockInfo = new BlockInfo(cozeLength + asbLength, cdLength, cdData);
         blockInfos.add(blockInfo);
 
         // init End of Central Directory
-        blockInfo = new BlockInfo(cozeLength + asbLength + cdLength,eocdLength,eocdData);
+        blockInfo = new BlockInfo(cozeLength + asbLength + cdLength, eocdLength, eocdData);
         blockInfos.add(blockInfo);
 
         // init sgn Data
-        blockInfo = new BlockInfo(cozeLength + asbLength + cdLength + eocdLength, sgnLength,sgnData);
+        blockInfo = new BlockInfo(cozeLength + asbLength + cdLength + eocdLength, sgnLength, sgnData);
         blockInfos.add(blockInfo);
     }
 

@@ -3,6 +3,8 @@ package com.malio.socket;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,7 +14,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -105,12 +110,18 @@ public class MainActivity extends Activity {
 
     // 切换为标准机
     private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onClick(View v) {
             MainActivity context = MainActivity.this;
             mSelectID = v.getId();
-
-            context.setContentView(R.layout.activity_main);
+            Intent intent = new Intent();
+            intent.setAction("com.mediatek.mtklogger.ADB_CMD");
+            intent.setPackage("com.mediatek.mtklogger");
+            intent.putExtra("cmd_name", "start");
+            intent.putExtra("cmd_target", 23);
+            MainActivity.this.sendBroadcast(intent);
+            /*context.setContentView(R.layout.activity_main);
             mMsgView = (TextView) context.findViewById(R.id.message);
             mLine2 = (LinearLayout) context.findViewById(R.id.line2);
             mLine3 = (LinearLayout) context.findViewById(R.id.line3);
@@ -142,7 +153,7 @@ public class MainActivity extends Activity {
                 pswd = WIFI_PSWD;
                 mWifi = new Wifi(context, ssid, pswd);
                 mWifi.Connect();
-            }
+            }*/
         }
     };
 

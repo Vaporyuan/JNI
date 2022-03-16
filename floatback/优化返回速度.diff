@@ -1,0 +1,68 @@
+diff --git a/floatback/src/main/java/com/ob/floatback/FxService.java b/floatback/src/main/java/com/ob/floatback/FxService.java
+index 63073ef..15092e6 100644
+--- a/floatback/src/main/java/com/ob/floatback/FxService.java
++++ b/floatback/src/main/java/com/ob/floatback/FxService.java
+@@ -4,9 +4,13 @@ import android.app.Service;
+ 
+ import android.content.Intent;
+ import android.graphics.PixelFormat;
++import android.hardware.input.InputManager;
+ import android.os.IBinder;
++import android.os.SystemClock;
+ import android.util.Log;
+ import android.view.Gravity;
++import android.view.InputDevice;
++import android.view.KeyCharacterMap;
+ import android.view.KeyEvent;
+ import android.view.LayoutInflater;
+ import android.view.MotionEvent;
+@@ -24,7 +28,7 @@ public class FxService extends Service {
+     private WindowManager.LayoutParams wmParams;
+     private WindowManager mWindowManager;
+     private Button mFloatView;
+-
++    private long mDownTime;
+     private static final String TAG = "FxService";
+     private boolean moving = false;
+     private final boolean DEBUG = false;
+@@ -107,7 +111,9 @@ public class FxService extends Service {
+                     mWindowManager.updateViewLayout(mFloatLayout, wmParams);
+                 }
+                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
++                    mDownTime = SystemClock.uptimeMillis();
+                     mFloatView.setBackgroundResource(R.drawable.btn_background_round_pressed);
++                    sendEvent(KeyEvent.KEYCODE_BACK, KeyEvent.ACTION_DOWN, 0, mDownTime);
+                     return false;
+                 } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                     mFloatView.setBackgroundResource(R.drawable.btn_background_round_normal);
+@@ -115,7 +121,10 @@ public class FxService extends Service {
+                     if (!moving) {
+                         //点击的处理
+                         if (DEBUG) Log.i(TAG, "onClick mFloatView");
+-                        sendKeyCode(KeyEvent.KEYCODE_BACK);
++                        //sendKeyCode(KeyEvent.KEYCODE_BACK);
++                        sendEvent(KeyEvent.KEYCODE_BACK, KeyEvent.ACTION_UP, 0);
++                    }else{
++                        sendEvent(KeyEvent.KEYCODE_BACK, KeyEvent.ACTION_UP, KeyEvent.FLAG_CANCELED);
+                     }
+                     moving = false;
+                     return false;
+@@ -157,4 +166,17 @@ public class FxService extends Service {
+             e.printStackTrace();
+         }
+     }
++
++    public void sendEvent(int mCode, int action, int flags) {
++        sendEvent(mCode, action, flags, SystemClock.uptimeMillis());
++    }
++
++    void sendEvent(int mCode, int action, int flags, long when) {
++        final int repeatCount = (flags & KeyEvent.FLAG_LONG_PRESS) != 0 ? 1 : 0;
++        final KeyEvent ev = new KeyEvent(mDownTime, when, action, mCode, repeatCount,
++                0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
++                flags | KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY,
++                InputDevice.SOURCE_KEYBOARD);
++        InputManager.getInstance().injectInputEvent(ev, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
++    }
+ }
+\ No newline at end of file

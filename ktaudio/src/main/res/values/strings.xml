@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">KtAudio</string>
+    <string name="volume_music">媒体音量</string>
+    <string name="volume_system">系统音量</string>
+    <string name="volume_alarm">闹钟音量</string>
+    <string name="keycode_back"><![CDATA[<返回]]></string>
+</resources>

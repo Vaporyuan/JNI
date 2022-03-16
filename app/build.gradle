@@ -60,7 +60,7 @@ dependencies {
     //implementation 'com.android.support:recyclerview-v7:28.0.0'
     //implementation files('libs/udroidsdk_191021.jar')
     implementation files('libs/malio-framework.jar')
-    compileOnly files('libs/vendor.mediatek.hardware.nvram-V1.0.jar')
+    //compileOnly files('libs/vendor.mediatek.hardware.nvram-V1.0.jar')
     //compileOnly files('libs/malio-framework.jar')
     //implementation 'com.android.support:design:28.0.0'
     //implementation 'com.github.mjdev:libaums:0.5.5'
